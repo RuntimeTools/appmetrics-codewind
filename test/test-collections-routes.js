@@ -235,6 +235,61 @@ tap.test('GET collections', function(t) {
   });
 });
 
+// Test to GET features available
+tap.test('GET collections features', function(t) {
+  const options = {
+    url: base + '/appmetrics/api/v1/collections/features',
+    method: 'GET'
+  };
+  debug('request %j', options);
+  request(options, function(err, res, body) {
+    t.ifError(err);
+    let json = JSON.parse(body);
+    t.equal(json.timedMetrics, true);
+    t.equal(res.statusCode, 200);
+    t.end();
+  });
+});
+
+// Test creating a new timed collection
+tap.test('POST new timed collection for 3 seconds', function(t) {
+  const options = {
+    url: base + '/appmetrics/api/v1/collections/3',
+    method: 'POST'
+  };
+  debug('request %j', options);
+  request(options, function(err, res, body) {
+    t.ifError(err);
+    t.equal(res.statusCode, 201);
+    t.equal(body, '{"uri":"collections/2"}');
+    t.end();
+  });
+});
+
+// Test that the stashed metrics are available
+tap.test('GET stashed collection', function(t) {
+  // wait for 5 seconds
+  const sleeptime = 5 * 1000;
+  setTimeout(function(){
+    const options = {
+      url: base + '/appmetrics/api/v1/collections/2/stashed',
+      method: 'GET'
+    };
+    debug('request %j', options);
+    request(options, function(err, res, body) {
+      t.ifError(err);
+      let json = JSON.parse(body);
+      t.equal(json.id, 2);
+      t.equal(res.statusCode, 200);
+      const diff = json.time.data.end - json.time.data.start;
+      if (diff <= 0 || diff > 4) {
+        t.end();
+      }
+    });
+  }, sleeptime);
+});
+
+
 tap.test('stop', function(t) {
   server.close(t.end);
 });
