@@ -1,6 +1,6 @@
 {
   "name": "appmetrics-codewind",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Provides a /metrics endpoints for Application Metrics",
   "main": "index.js",
   "dependencies": {
